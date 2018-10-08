@@ -25,8 +25,14 @@
 
 %% @doc Checks if a global flag is set.
 -spec is_set(binary() | list()) -> boolean().
-is_set(Flag) when is_binary(Flag); is_list(Flag) ->
-    try list_to_existing_atom(to_flag(Flag)) of
+is_set(Flag) when is_binary(Flag) ->
+    try binary_to_existing_atom(Flag, utf8) of
+        _ -> true
+    catch
+        _:_ -> false
+    end;
+is_set(Flag) when is_list(Flag) ->
+    try list_to_existing_atom(Flag) of
         _ -> true
     catch
         _:_ -> false
@@ -48,8 +54,11 @@ once(Flag, Fun) when
 
 %% @doc Sets a global flag, typically only used internally.
 -spec set(binary() | list()) -> ok.
-set(Flag) when is_binary(Flag); is_list(Flag) ->
-    _ = list_to_atom(to_flag(Flag)),
+set(Flag) when is_binary(Flag) ->
+    _ = erlang:binary_to_atom(Flag),
+    ok;
+set(Flag) when is_list(Flag) ->
+    _ = list_to_atom(Flag),
     ok.
 
 %% @doc Runs a function only if the provided flag is set.
@@ -73,15 +82,6 @@ without(Flag, Fun) when
         true    -> {error, flag_state};
         false   -> Fun()
     end.
-
-%% ===================================================================
-%% Private API
-%% ===================================================================
-
-to_flag(Flag) when is_list(Flag) ->
-    string:concat("flag:", Flag);
-to_flag(Flag) when is_binary(Flag) ->
-    to_flag(binary_to_list(Flag)).
 
 %% ===================================================================
 %% Private test cases
