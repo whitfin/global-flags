@@ -14,6 +14,7 @@
 %% to purge from the atom table. If you want such ability, you
 %% likely want to deal with ETS or some other storage.
 -module(global_flags).
+-compile(inline).
 
 %% Public API
 -export([is_set/1, once/2, set/1, with/2, without/2]).
