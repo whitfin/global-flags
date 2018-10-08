@@ -32,14 +32,17 @@ is_set(Flag) when is_binary(Flag); is_list(Flag) ->
     end.
 
 %% @doc Runs a function a single time, based on the provided flag.
--spec once(binary() | list(), fun(() -> any())) -> ok.
+-spec once(binary() | list(), fun(() -> any())) -> any | {error, flag_state}.
 once(Flag, Fun) when
     is_binary(Flag); is_list(Flag),
     is_function(Fun, 0)
 ->
     case is_set(Flag) of
-        true -> ok;
-        false -> Fun(), set(Flag)
+        true    -> {error, flag_state};
+        false   ->
+            Result = Fun(),
+            set(Flag),
+            Result
     end.
 
 %% @doc Sets a global flag, typically only used internally.
@@ -49,25 +52,25 @@ set(Flag) when is_binary(Flag); is_list(Flag) ->
     ok.
 
 %% @doc Runs a function only if the provided flag is set.
--spec with(binary() | list(), fun(() -> any())) -> ok.
+-spec with(binary() | list(), fun(() -> any())) -> any | {error, flag_state}.
 with(Flag, Fun) when
     is_binary(Flag); is_list(Flag),
     is_function(Fun, 0)
 ->
     case is_set(Flag) of
-        false   -> ok;
-        true    -> Fun(), ok
+        false   -> {error, flag_state};
+        true    -> Fun()
     end.
 
 %% @doc Runs a function only if the provided flag is not set.
--spec without(binary() | list(), fun(() -> any())) -> ok.
+-spec without(binary() | list(), fun(() -> any())) -> any | {error, flag_state}.
 without(Flag, Fun) when
     is_binary(Flag); is_list(Flag),
     is_function(Fun, 0)
 ->
     case is_set(Flag) of
-        true    -> ok;
-        false   -> Fun(), ok
+        true    -> {error, flag_state};
+        false   -> Fun()
     end.
 
 %% ===================================================================
@@ -95,40 +98,30 @@ to_flag(Flag) when is_binary(Flag) ->
 
     once_test() ->
         Flag = "test_once",
-        global_flags:once(Flag, fun() ->
-            ok
+        Once1 = global_flags:once(Flag, fun() ->
+            woohoo
         end),
-        global_flags:once(Flag, fun() ->
-            error("should not receive second call")
-        end).
+        Once2 = global_flags:once(Flag, fun() ->
+            woohoo
+        end),
+        ?assert(Once1 =:= woohoo),
+        ?assert(Once2 =:= {error, flag_state}).
 
     with_test() ->
         Flag = "test_with",
-        global_flags:with(Flag, fun() ->
-            error("should not run due to being unset")
-        end),
+        Handle = fun() -> woohoo end,
+        With1 = global_flags:with(Flag, Handle),
         global_flags:set(Flag),
-        global_flags:with(Flag, fun() ->
-            self() ! 1
-        end),
-        receive
-            1 -> ok
-        after
-            100 -> error("should have received a message")
-        end.
+        With2 = global_flags:with(Flag, Handle),
+        ?assert(With1 =:= {error, flag_state}),
+        ?assert(With2 =:= woohoo).
 
     without_test() ->
         Flag = "test_without",
-        global_flags:without(Flag, fun() ->
-            self() ! 1
-        end),
-        receive
-            1 -> ok
-        after
-            100 -> error("should have received a message")
-        end,
+        Handle = fun() -> woohoo end,
+        Without1 = global_flags:without(Flag, Handle),
         global_flags:set(Flag),
-        global_flags:without(Flag, fun() ->
-            error("should not run due to being set")
-        end).
+        Without2 = global_flags:without(Flag, Handle),
+        ?assert(Without1 =:= woohoo),
+        ?assert(Without2 =:= {error, flag_state}).
 -endif.
