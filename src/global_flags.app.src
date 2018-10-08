@@ -4,6 +4,6 @@
    {modules, []},
    {registered, []},
    {applications, [kernel, stdlib]},
-   {maintainers, ["Isaac Whtifield"]},
+   {maintainers, ["Isaac Whitfield"]},
    {licenses, ["MIT"]},
    {links, [{"Github", "https://github.com/whitfin/global-flags"}]}]}.
