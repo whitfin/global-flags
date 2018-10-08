@@ -55,7 +55,7 @@ once(Flag, Fun) when
 %% @doc Sets a global flag, typically only used internally.
 -spec set(binary() | list()) -> ok.
 set(Flag) when is_binary(Flag) ->
-    _ = erlang:binary_to_atom(Flag),
+    _ = binary_to_atom(Flag, utf8),
     ok;
 set(Flag) when is_list(Flag) ->
     _ = list_to_atom(Flag),
