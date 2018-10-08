@@ -78,3 +78,30 @@ iex(4)> :global_flags.with("app:init", fn -> IO.puts("will only run when set") e
 # only runs when the flag has been not been set
 iex(5)> :global_flags.without("app:init", fn -> IO.puts("will only run when unset") end)
 ```
+
+## Examples
+
+This example is in Elixir, but it should be fairly understandable for those coming from
+both languages. It contains a counter that's global to the entire runtime, which creates
+itself on the first call. This is useful because all applications using this counter would
+increment atomically, even if they're not explicitly linked directly.
+
+```elixir
+defmodule GlobalCounter do
+
+  @doc """
+  Retrieves the next integer in the global counter.
+  """
+  def next_int do
+    # initializes the Agent only the first time called
+    :global_flags.once("global_counter:init", fn ->
+      Agent.start(fn -> 1 end, [ name: :global_counter ])
+    end)
+
+    # guaranteed to now have a started Agent
+    Agent.get_and_update(:global_counter, fn count ->
+      {count, count + 1}
+    end)
+  end
+end
+```
