@@ -30,7 +30,7 @@ Rebar setup to use Hex as a dependency source, then you can grab it directly:
 ### Mix
 
 To install it for your project, you can pull it directly from Hex. Rather
-than use the version shown below, you can use the the latest version from
+than use the version shown below, you can use the latest version from
 Hex (shown at the top of this README).
 
 ```elixir
