@@ -1,5 +1,5 @@
 # global-flags
-[![Build Status](https://img.shields.io/github/workflow/status/whitfin/global-flags/CI)](https://github.com/whitfin/global-flags/actions) [![Hex.pm Version](https://img.shields.io/hexpm/v/global_flags.svg)](https://hex.pm/packages/global_flags) [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://hexdocs.pm/global_flags/)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/whitfin/global-flags/ci.yml?branch=main)](https://github.com/whitfin/global-flags/actions) [![Hex.pm Version](https://img.shields.io/hexpm/v/global_flags.svg)](https://hex.pm/packages/global_flags) [![Documentation](https://img.shields.io/badge/docs-latest-blue.svg)](https://hexdocs.pm/global_flags/)
 
 This library is designed to provide an easy way to initialize global flags in Erlang/Elixir,
 without having to be linked to a main application tree.
